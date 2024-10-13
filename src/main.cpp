@@ -175,6 +175,10 @@ int main() {
       bullet.Draw();
     }
 
+    DrawText("Space Invader", 20, 20, 10, BLACK);
+    DrawText("- Right/Left to move", 40, 40, 10, DARKGRAY);
+    DrawText("- Spacebar to shoot a bullet", 40, 60, 10, DARKGRAY);
+
     EndDrawing();
   }
 
