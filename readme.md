@@ -25,3 +25,6 @@ This project is a simple recreation of the classic "Space Invader" game, created
 make
 ./build/space_invader
 ```
+
+![image](https://github.com/user-attachments/assets/009f0b8e-479d-4a60-8804-987e280f0c45)
+
