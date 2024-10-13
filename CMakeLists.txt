@@ -12,23 +12,22 @@ project(space_invader VERSION 0.5
   DESCRIPTION "Space Invader"
   LANGUAGES CXX)
 
-set(SOURCES
-    src/main.cpp
-)
+include_directories(include)
 
-# Add an executable target first
+# Add all source files in the src directory
+file(GLOB SOURCES src/*.cpp)
+
 add_executable(space_invader ${SOURCES})
 
 # set the include and library paths manually because cmake can't find this.
 set(raylib_INCLUDE_DIR /home/linuxbrew/.linuxbrew/opt/raylib/include)
 set(raylib_LIBRARY /home/linuxbrew/.linuxbrew/opt/raylib/lib/libraylib.a)
 
+# Third party
+find_package(raylib REQUIRED)
+
 # Include raylib headers
 include_directories(${raylib_INCLUDE_DIR})
 
-## Graphics
-find_package(raylib REQUIRED)
-
 # Link raylib library after the executable target is created
 target_link_libraries(space_invader PRIVATE ${raylib_LIBRARY})
-

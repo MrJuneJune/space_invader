@@ -1,84 +1,19 @@
+#include "block.h"
+#include "bullet.h"
+#include "player.h"
 #include "raylib.h"
 #include <algorithm>
 #include <array>
 #include <vector>
 
-struct Entity {
-  float x = 0;
-  float y = 0;
-  float width = 20;
-  float height = 20;
-  float speed = 200;
-
-  bool destructable = true;
-};
-
-struct Bullet {
-  Entity entity;
-
-  bool isFired = false;
-
-  void Draw() {
-    DrawRectangle(entity.x, entity.y, entity.width, entity.height, RED);
-  }
-
-  void Update(float deltaTime) { entity.y -= entity.speed * deltaTime; }
-};
-
-struct Block {
-  Entity entity;
-  int health = 3;
-
-  void Draw() {
-    if (health > 0) {
-      Color color = (health == 3) ? PINK : (health == 2) ? ORANGE : YELLOW;
-      DrawRectangle(entity.x, entity.y, entity.width, entity.height, color);
-    }
-  }
-
-  bool Hit(const Bullet &bullet) {
-    bool collisionX = bullet.entity.x + bullet.entity.width >= entity.x &&
-                      bullet.entity.x <= entity.x + entity.width;
-    bool collisionY = bullet.entity.y + bullet.entity.height >= entity.y &&
-                      bullet.entity.y <= entity.y + entity.height;
-
-    if (collisionX && collisionY && bullet.isFired) {
-      health--;
-      return true;
-    }
-
-    return false;
-  }
-
-  bool IsDestroyed() { return health <= 0; }
-};
-
-struct Player {
-  Entity entity;
-  int health = 10;
-
-  void Draw() {
-    DrawRectangle(entity.x, entity.y, entity.width, entity.height, BLUE);
-  }
-
-  void Update(float deltaTime) {
-    if (IsKeyDown(KEY_LEFT))
-      entity.x -= entity.speed * deltaTime;
-    if (IsKeyDown(KEY_RIGHT))
-      entity.x += entity.speed * deltaTime;
-
-    if (entity.x < 0)
-      entity.x = 0;
-    if (entity.x + entity.width > GetScreenWidth())
-      entity.x = GetScreenWidth() - entity.width;
-  }
-};
-
 int main() {
   const int screenWidth = 800;
   const int screenHeight = 600;
-  InitWindow(screenWidth, screenHeight, "Space Invader Game");
 
+  InitWindow(screenWidth, screenHeight, "Space Invader Game");
+  InitAudioDevice();
+
+  Sound laserSound = LoadSound("./assets/laser_sound.mp3");
   SetTargetFPS(60);
 
   Player player = {0};
@@ -114,7 +49,6 @@ int main() {
     }
   }
 
-  // Bullet
   Bullet bullet = {0};
   bullet.entity.width = 5;
   bullet.entity.height = 10;
@@ -132,13 +66,14 @@ int main() {
           player.entity.x + player.entity.width / 2 - bullet.entity.width / 2;
       bullet.entity.y = player.entity.y;
       bullet.isFired = true;
+      PlaySound(laserSound);
     }
 
     // Update bullet position
     if (bullet.isFired) {
       bullet.Update(deltaTime);
       if (bullet.entity.y < 0) {
-        bullet.isFired = false; // Reset bullet when it goes off screen
+        bullet.isFired = false;
       }
     }
 
@@ -149,7 +84,7 @@ int main() {
         continue;
 
       if (block->Hit(bullet)) {
-        bullet.isFired = false; // Bullet disappears after hit
+        bullet.isFired = false;
       }
 
       if (block->IsDestroyed()) {
@@ -187,7 +122,7 @@ int main() {
       delete blocks[i];
     }
   }
-
+  UnloadSound(laserSound);
   CloseWindow();
   return 0;
 }
